@@ -1,4 +1,4 @@
 # Python cache & compiled files
-__pycache__/
+__pycache__
 *.pyc
 
