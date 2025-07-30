@@ -1,0 +1,19 @@
+# Python cache & compiled files
+__pycache__/
+*.pyc
+
+# Virtual environment (if you create one locally)
+venv/
+env/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Uploaded or processed files (if you don’t want to keep them in repo)
+uploads/
+processed/
+
+# IDE or editor files
+.vscode/
+.idea/
