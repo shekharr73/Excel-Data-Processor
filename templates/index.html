@@ -2,75 +2,236 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Excel Data Processor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Excel Data Processor - Excel Analytics</title>
+  
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body class="bg-light">
-  <div class="container py-5">
-    <div class="text-center mb-4">
-      <h1 class="fw-bold text-primary"><i class="bi bi-file-earmark-excel"></i> Excel Data Processor</h1>
-      <p class="lead text-muted">Process and summarize outward supply data from Excel files</p>
+<body>
+  <header class="header-section">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <h1 class="main-title">
+            <i class="bi bi-graph-up-arrow text-primary"></i>
+            Excel Data Processor
+          </h1>
+          <p class="subtitle">Transform your Excel data into actionable insights</p>
+        </div>
+        <div class="col-md-6 text-md-end">
+          <div class="feature-badges">
+            <span class="badge bg-success me-2">
+              <i class="bi bi-shield-check"></i> Secure Processing
+            </span>
+            <span class="badge bg-info me-2">
+              <i class="bi bi-lightning"></i> Fast Analysis
+            </span>
+            <span class="badge bg-warning">
+              <i class="bi bi-file-earmark-excel"></i> Excel Compatible
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
+  </header>
 
-    <div class="card mb-3">
-      <div class="card-body">
-        <form id="upload-form" enctype="multipart/form-data">
-          <div class="upload-area" id="upload-area">
-            <i class="bi bi-file-earmark-excel display-1 text-primary mb-3"></i>
-            <h5 class="mb-3">Drag & Drop your Excel file here</h5>
-            <p class="text-muted mb-3">or click to browse</p>
-            <input type="file" id="file-input" name="file" class="file-input" accept=".xlsx,.xls">
-            <button type="button" class="btn btn-upload" onclick="document.getElementById('file-input').click()">
-              <i class="bi bi-folder2-open"></i> Choose File
-            </button>
-            <div id="file-info" class="mt-3" style="display:none;">
-              <div class="alert alert-info"><i class="bi bi-file-earmark"></i> <span id="selected-file"></span></div>
+  <main class="main-content">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="upload-card">
+            <div class="card-header-section">
+              <div class="icon-wrapper">
+                <i class="bi bi-cloud-upload"></i>
+              </div>
+              <h2>Upload Your Excel File</h2>
+              <p>Process Excel data with intelligent filtering and summarization</p>
             </div>
-          </div>
-          <div class="text-center mt-4">
-            <button type="submit" class="btn btn-upload" id="process-btn" disabled>
-              <i class="bi bi-gear"></i> Process File
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
 
-    <p>
-      <a class="btn btn-outline-primary" data-bs-toggle="collapse" href="#instructions" role="button">
-        <i class="bi bi-info-circle"></i> View Instructions
-      </a>
-    </p>
-    <div class="collapse" id="instructions">
-      <div class="card card-body">
-        <ul class="mb-0">
-          <li>Upload Excel file with outward supply data</li>
-          <li>File is cleaned & filtered for valid GSTIN entries</li>
-          <li>Data grouped by "Type of supply"</li>
-          <li>Sums for Taxable Value, IGST, CGST, SGST/UTGST</li>
-          <li>Download processed summary file</li>
-        </ul>
-      </div>
-    </div>
+            <div class="card-body">
+              <form id="upload-form" class="upload-form">
+                <div class="file-upload-area" id="file-upload-area">
+                  <div class="upload-icon">
+                    <i class="bi bi-file-earmark-excel"></i>
+                  </div>
+                  <h3>Choose Excel File</h3>
+                  <p>Drag and drop your file here or click to browse</p>
+                  <input type="file" id="file-input" name="file" accept=".xlsx,.xls" hidden required>
+                  <button type="button" class="btn btn-primary btn-lg upload-btn" id="browse-btn">
+                    <i class="bi bi-folder2-open"></i> Browse Files
+                  </button>
+                </div>
 
-    <div id="processing-section" class="processing text-center py-4">
-      <div class="spinner-border text-primary mb-3"></div>
-      <h5 class="text-primary">Processing your file...</h5>
-    </div>
+                <div id="file-info" class="file-info" style="display: none;">
+                  <div class="file-details">
+                    <div class="file-icon">
+                      <i class="bi bi-file-earmark-excel text-success"></i>
+                    </div>
+                    <div class="file-text">
+                      <h4 id="file-name"></h4>
+                      <p id="file-size"></p>
+                    </div>
+                    <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeFile()">
+                      <i class="bi bi-x"></i>
+                    </button>
+                  </div>
+                </div>
 
-    <div id="download-section" class="download-section text-center py-4">
-      <div class="alert alert-success"><i class="bi bi-check-circle-fill"></i> File processed successfully!</div>
-      <a href="#" id="download-link" class="btn btn-download"><i class="bi bi-download"></i> Download Processed File</a>
-      <button type="button" class="btn btn-outline-secondary mt-2" onclick="resetForm()">
-        <i class="bi bi-arrow-clockwise"></i> Process Another File
-      </button>
-    </div>
-  </div>
+                <div class="text-center mt-4">
+                  <button type="submit" class="btn btn-success btn-lg process-btn" id="process-btn" disabled>
+                    <i class="bi bi-gear-wide-connected"></i> Process Data
+                  </button>
+                </div>
+              </form>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-</body>
-</html>
+              <div id="processing" class="processing-section" style="display: none;">
+                <div class="processing-content">
+                  <div class="spinner-wrapper">
+                    <div class="spinner"></div>
+                  </div>
+                  <h3>Processing Your Data</h3>
+                  <p>Analyzing Excel data and generating summary...</p>
+                  <div class="progress-steps">
+                    <div class="step active">
+                      <i class="bi bi-check-circle-fill"></i>
+                      <span>Validating file format</span>
+                    </div>
+                                          <div class="step" id="step-2">
+                        <i class="bi bi-circle"></i>
+                        <span>Filtering data entries</span>
+                      </div>
+                     <div class="step" id="step-3">
+                       <i class="bi bi-circle"></i>
+                       <span>Calculating summaries</span>
+                     </div>
+                     <div class="step" id="step-4">
+                       <i class="bi bi-circle"></i>
+                       <span>Generating report</span>
+                     </div>
+                   </div>
+                 </div>
+               </div>
+
+               <div id="download-section" class="download-section" style="display: none;">
+                 <div class="success-animation">
+                   <div class="checkmark">
+                     <i class="bi bi-check-circle-fill"></i>
+                   </div>
+                 </div>
+                 <h3>Processing Complete!</h3>
+                 <p>Your data has been successfully processed and summarized.</p>
+                 
+                 <div class="download-actions">
+                   <a id="download-link" class="btn btn-primary btn-lg download-btn">
+                     <i class="bi bi-download"></i> Download Processed File
+                   </a>
+                   <button type="button" class="btn btn-outline-secondary btn-lg" onclick="resetForm()">
+                     <i class="bi bi-arrow-clockwise"></i> Process Another File
+                   </button>
+                 </div>
+               </div>
+             </div>
+           </div>
+
+           <div class="features-section">
+             <div class="row">
+               <div class="col-md-4">
+                 <div class="feature-card">
+                   <div class="feature-icon">
+                     <i class="bi bi-funnel"></i>
+                   </div>
+                   <h4>Smart Filtering</h4>
+                   <p>Automatically filters and validates data entries for accurate processing</p>
+                 </div>
+               </div>
+               <div class="col-md-4">
+                 <div class="feature-card">
+                   <div class="feature-icon">
+                     <i class="bi bi-calculator"></i>
+                   </div>
+                   <h4>Auto Calculation</h4>
+                   <p>Calculates sums and aggregates data by specified categories</p>
+                 </div>
+               </div>
+               <div class="col-md-4">
+                 <div class="feature-card">
+                   <div class="feature-icon">
+                     <i class="bi bi-file-earmark-spreadsheet"></i>
+                   </div>
+                   <h4>Clean Output</h4>
+                   <p>Generates organized Excel summaries ready for analysis and reporting</p>
+                 </div>
+               </div>
+             </div>
+           </div>
+
+           <div class="instructions-section">
+             <div class="accordion" id="instructions">
+               <div class="accordion-item">
+                 <h2 class="accordion-header">
+                   <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse">
+                     <i class="bi bi-info-circle"></i> How It Works
+                   </button>
+                 </h2>
+                 <div id="collapse" class="accordion-collapse collapse">
+                   <div class="accordion-body">
+                     <div class="steps-list">
+                       <div class="step-item">
+                         <div class="step-number">1</div>
+                         <div class="step-content">
+                           <h5>Upload Excel File</h5>
+                           <p>Upload your outward supply data Excel file (supports .xlsx and .xls formats)</p>
+                         </div>
+                       </div>
+                       <div class="step-item">
+                         <div class="step-number">2</div>
+                         <div class="step-content">
+                                                    <h5>Data Validation</h5>
+                          <p>System validates required columns and filters for valid data entries</p>
+                         </div>
+                       </div>
+                       <div class="step-item">
+                         <div class="step-number">3</div>
+                         <div class="step-content">
+                                                    <h5>Processing</h5>
+                          <p>Data is grouped by specified categories and calculations are performed</p>
+                         </div>
+                       </div>
+                       <div class="step-item">
+                         <div class="step-number">4</div>
+                         <div class="step-content">
+                                                    <h5>Download Summary</h5>
+                          <p>Download the processed summary file with organized calculations</p>
+                         </div>
+                       </div>
+                     </div>
+                   </div>
+                 </div>
+               </div>
+             </div>
+           </div>
+         </div>
+       </div>
+     </div>
+   </main>
+
+   <footer class="footer-section">
+     <div class="container">
+       <div class="row">
+         <div class="col-md-6">
+           <p>&copy; 2025 Excel Data Processor. Built with modern web technologies.</p>
+         </div>
+         <div class="col-md-6 text-md-end">
+           <p>Secure • Fast • Reliable</p>
+         </div>
+       </div>
+     </div>
+   </footer>
+
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+   <script src="{{ url_for('static', filename='script.js') }}"></script>
+ </body>
+ </html>
